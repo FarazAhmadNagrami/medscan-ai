@@ -15,7 +15,10 @@ export default function LanguageSelector() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      <div className="absolute right-0 top-full mt-1 w-44 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+      <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+        <p className="px-3 pt-2 pb-1 text-[11px] text-gray-400 dark:text-gray-500 font-medium uppercase tracking-wide">
+          AI response language
+        </p>
         {LANGUAGES.map((lang) => (
           <button
             key={lang.code}
