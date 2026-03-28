@@ -18,15 +18,21 @@ function LoginForm() {
   const [busy, setBusy]       = useState(false);
 
   useEffect(() => {
-    if (!loading && user) router.replace(from);
+    if (!loading && user) {
+      // Prefer the sessionStorage destination saved before SSO redirect (from param is lost through Firebase auth domain)
+      const saved = sessionStorage.getItem("auth_redirect");
+      sessionStorage.removeItem("auth_redirect");
+      router.replace(saved && saved !== "/login" ? saved : from !== "/login" ? from : "/");
+    }
   }, [user, loading, router, from]);
 
   const handleGoogleSignIn = async () => {
     setError(null);
     setBusy(true);
     try {
+      // Save destination before redirect — query params are lost through Firebase's auth domain
+      sessionStorage.setItem("auth_redirect", from);
       await signInWithGoogle();
-      // redirect happens automatically via signInWithRedirect
     } catch (err) {
       setBusy(false);
       setError(err instanceof Error ? err.message : "Google sign-in failed");

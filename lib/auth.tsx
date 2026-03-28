@@ -35,8 +35,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Handle redirect result from Google sign-in
-    getRedirectResult(auth).catch(() => {});
+    // Process the redirect result — onAuthStateChanged below will pick up the signed-in user automatically
+    getRedirectResult(auth).catch(() => {
+      // Silently ignore — onAuthStateChanged handles the user state
+    });
 
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
