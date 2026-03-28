@@ -24,6 +24,12 @@ const navLinks = [
   { href: "/medication-reminder",  label: "Reminders" },
   { href: "/emergency-sos",        label: "SOS 🚨" },
   { href: "/history",              label: "History" },
+  { href: "/food-scanner",         label: "Food" },
+  { href: "/water-tracker",        label: "Water" },
+  { href: "/health-goals",         label: "Goals" },
+  { href: "/exercise-log",         label: "Exercise" },
+  { href: "/medical-card",         label: "Med Card" },
+  { href: "/share-doctor",         label: "Share" },
 ];
 
 export default function Navbar() {

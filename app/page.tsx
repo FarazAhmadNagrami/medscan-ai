@@ -17,6 +17,12 @@ const modules = [
   { title: "Medication Reminder",    icon: "⏰", href: "/medication-reminder",    gradient: "from-yellow-500 to-orange-400",badge: "Push Notif",  desc: "Set up browser push notification reminders for your daily medications with dosage and frequency." },
   { title: "Emergency SOS",          icon: "🚨", href: "/emergency-sos",          gradient: "from-red-600 to-red-500",      badge: "Critical",    desc: "Find nearest hospitals on a live map. One-tap emergency calling. Country-wise emergency numbers." },
   { title: "Scan History",           icon: "📋", href: "/history",               gradient: "from-gray-500 to-slate-400",   badge: "Local",       desc: "Browse your complete scan timeline across all modules. All data stored locally and privately." },
+  { title: "Food Calorie Scanner",   icon: "🍽️", href: "/food-scanner",           gradient: "from-orange-500 to-yellow-400", badge: "Vision AI",   desc: "Snap a meal photo — AI instantly identifies every item and calculates full nutrition & calories." },
+  { title: "Water Tracker",          icon: "💧", href: "/water-tracker",          gradient: "from-cyan-500 to-blue-400",    badge: "Tracker",     desc: "Tap to log water intake with animated progress ring. Customizable daily goal." },
+  { title: "Health Goals",           icon: "🎯", href: "/health-goals",           gradient: "from-green-500 to-teal-400",   badge: "Goals",       desc: "Set health targets for weight, BP, blood sugar, steps, and more. Track progress with deadlines." },
+  { title: "Exercise Log",           icon: "🏃", href: "/exercise-log",           gradient: "from-purple-500 to-violet-400",badge: "Fitness",     desc: "Log workouts with calorie burn estimates. Weekly activity bar chart included." },
+  { title: "Emergency Medical Card", icon: "🆘", href: "/medical-card",           gradient: "from-red-600 to-rose-500",     badge: "QR Code",     desc: "Store critical health info. Generate a QR code card to show first responders in an emergency." },
+  { title: "Share with Doctor",      icon: "📋", href: "/share-doctor",           gradient: "from-blue-600 to-indigo-500",  badge: "Export",      desc: "Print or copy a complete health summary — vitals, meds, goals, nutrition — for your appointment." },
 ];
 
 export default function Dashboard() {
@@ -33,7 +39,7 @@ export default function Dashboard() {
           <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Assistant</span>
         </h1>
         <p className="max-w-2xl mx-auto text-lg text-gray-500 dark:text-gray-400">
-          16 intelligent modules — pills, lab reports, skin, symptoms, vitals, X-rays, allergies, mental health, and more.
+          22 intelligent modules — pills, lab reports, skin, symptoms, vitals, X-rays, food scanner, water tracker, goals, and more.
         </p>
       </div>
 
@@ -61,7 +67,7 @@ export default function Dashboard() {
       <div className="mt-14 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
         {[
           { label: "AI Model",    value: "Gemini Flash" },
-          { label: "Modules",    value: "16" },
+          { label: "Modules",    value: "22" },
           { label: "Drug DB",    value: "RxNorm FDA" },
           { label: "Cost",       value: "100% Free" },
         ].map((s) => (
