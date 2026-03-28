@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/lib/language";
 import { AuthProvider } from "@/lib/auth";
+import AuthGuard from "@/components/AuthGuard";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -38,7 +39,7 @@ export default function RootLayout({
           <AuthProvider>
           <LanguageProvider>
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1"><AuthGuard>{children}</AuthGuard></main>
           <footer className="text-center text-xs text-gray-400 dark:text-gray-600 py-4 border-t border-gray-200 dark:border-gray-800">
             © {new Date().getFullYear()} MedScan AI — For informational use
             only. Not a substitute for professional medical advice.

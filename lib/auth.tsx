@@ -1,21 +1,13 @@
 "use client";
 
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
+  createContext, useContext, useEffect, useState, ReactNode,
 } from "react";
 import {
-  User,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut as firebaseSignOut,
-  updateProfile,
+  User, onAuthStateChanged,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  signInWithRedirect, getRedirectResult,
+  GoogleAuthProvider, signOut as firebaseSignOut, updateProfile,
 } from "firebase/auth";
 import { auth } from "./firebase";
 
@@ -29,8 +21,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType>({
-  user: null,
-  loading: true,
+  user: null, loading: true,
   signInWithGoogle: async () => {},
   signInWithEmail: async () => {},
   signUpWithEmail: async () => {},
@@ -40,19 +31,22 @@ const AuthContext = createContext<AuthContextType>({
 const googleProvider = new GoogleAuthProvider();
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser]       = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
+    // Handle redirect result from Google sign-in
+    getRedirectResult(auth).catch(() => {});
+
+    const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
     });
-    return unsubscribe;
+    return unsub;
   }, []);
 
   const signInWithGoogle = async () => {
-    await signInWithPopup(auth, googleProvider);
+    await signInWithRedirect(auth, googleProvider);
   };
 
   const signInWithEmail = async (email: string, password: string) => {
