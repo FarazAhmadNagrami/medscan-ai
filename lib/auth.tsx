@@ -6,7 +6,7 @@ import {
 import {
   User, onAuthStateChanged,
   signInWithEmailAndPassword, createUserWithEmailAndPassword,
-  signInWithRedirect, getRedirectResult,
+  signInWithPopup,
   GoogleAuthProvider, signOut as firebaseSignOut, updateProfile,
 } from "firebase/auth";
 import { auth } from "./firebase";
@@ -35,11 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Process the redirect result — onAuthStateChanged below will pick up the signed-in user automatically
-    getRedirectResult(auth).catch(() => {
-      // Silently ignore — onAuthStateChanged handles the user state
-    });
-
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
@@ -48,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = async () => {
-    await signInWithRedirect(auth, googleProvider);
+    await signInWithPopup(auth, googleProvider);
   };
 
   const signInWithEmail = async (email: string, password: string) => {
