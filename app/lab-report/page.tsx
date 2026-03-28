@@ -6,6 +6,7 @@ import Disclaimer from "@/components/Disclaimer";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import { callGeminiText, parseJSON, RATE_LIMIT_ERROR } from "@/lib/gemini";
 import RateLimitError from "@/components/RateLimitError";
+import PrintButton from "@/components/PrintButton";
 
 interface LabParameter {
   parameter: string;
@@ -125,7 +126,7 @@ export default function LabReport() {
       )}
 
       {results && (
-        <div className="mt-8 space-y-6">
+        <div id="lab-result" className="mt-8 space-y-6">
           {/* Summary */}
           <div className="grid grid-cols-3 gap-4 text-center">
             {[
@@ -172,6 +173,10 @@ export default function LabReport() {
               </div>
             </div>
           )}
+
+          <div className="flex gap-3 flex-wrap pt-2">
+            <PrintButton contentId="lab-result" title="Lab Report Analysis" />
+          </div>
         </div>
       )}
 

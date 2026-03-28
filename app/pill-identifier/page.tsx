@@ -4,9 +4,12 @@ import { useState, useCallback } from "react";
 import ImageSourcePicker from "@/components/ImageSourcePicker";
 import Disclaimer from "@/components/Disclaimer";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
+import ShareButtons from "@/components/ShareButtons";
+import PrintButton from "@/components/PrintButton";
 import { callGeminiWithImage, parseJSON, RATE_LIMIT_ERROR } from "@/lib/gemini";
 import RateLimitError from "@/components/RateLimitError";
 import { fetchRxNormData, type RxNormDrug } from "@/lib/rxnorm";
+import { useLanguage, withLanguage } from "@/lib/language";
 
 interface PillResult {
   medicine_name: string;
@@ -49,6 +52,7 @@ export default function PillIdentifier() {
   const [rxData, setRxData] = useState<RxNormDrug | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastFile, setLastFile] = useState<File | null>(null);
+  const { language } = useLanguage();
 
   const handleFile = useCallback(async (file: File) => {
     setLastFile(file);
@@ -65,7 +69,10 @@ export default function PillIdentifier() {
 
       setLoading(true);
       try {
-        const prompt = `Identify this pill/tablet. Return the medicine name, dosage, manufacturer, common uses, side effects, and warnings in JSON format with keys: medicine_name, dosage, manufacturer, common_uses (array), side_effects (array), warnings (array).`;
+        const prompt = withLanguage(
+          `Identify this pill/tablet. Return the medicine name, dosage, manufacturer, common uses, side effects, and warnings in JSON format with keys: medicine_name, dosage, manufacturer, common_uses (array), side_effects (array), warnings (array).`,
+          language
+        );
         const raw = await callGeminiWithImage(base64, mimeType, prompt);
         const parsed = parseJSON<PillResult>(raw);
         if (!parsed) throw new Error("Could not parse AI response");
@@ -81,7 +88,11 @@ export default function PillIdentifier() {
       }
     };
     reader.readAsDataURL(file);
-  }, []);
+  }, [language]);
+
+  const shareText = result
+    ? `Pill Identified: ${result.medicine_name} ${result.dosage}\n\nUses: ${result.common_uses.join(", ")}\n\nWarnings: ${result.warnings.join(", ")}`
+    : "";
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -141,7 +152,7 @@ export default function PillIdentifier() {
       )}
 
       {result && (
-        <div className="mt-8 space-y-4">
+        <div id="pill-result" className="mt-8 space-y-4">
           {/* Main info card */}
           <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
             <div className="flex items-start justify-between flex-wrap gap-4">
@@ -233,6 +244,11 @@ export default function PillIdentifier() {
               </div>
             </div>
           )}
+
+          <div className="flex gap-3 flex-wrap pt-2">
+            <PrintButton contentId="pill-result" title="Pill Identification Report" />
+            <ShareButtons title="Pill Identification" text={shareText} />
+          </div>
         </div>
       )}
 

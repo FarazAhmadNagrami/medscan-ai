@@ -4,8 +4,11 @@ import { useState, useCallback } from "react";
 import ImageSourcePicker from "@/components/ImageSourcePicker";
 import Disclaimer from "@/components/Disclaimer";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
+import ShareButtons from "@/components/ShareButtons";
+import PrintButton from "@/components/PrintButton";
 import { callGeminiWithImage, parseJSON, RATE_LIMIT_ERROR } from "@/lib/gemini";
 import RateLimitError from "@/components/RateLimitError";
+import { useLanguage, withLanguage } from "@/lib/language";
 
 interface SkinCondition {
   name: string;
@@ -47,6 +50,7 @@ export default function SkinScan() {
   const [results, setResults] = useState<SkinCondition[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastFile, setLastFile] = useState<File | null>(null);
+  const { language } = useLanguage();
 
   const handleFile = useCallback(async (file: File) => {
     setLastFile(file);
@@ -61,7 +65,10 @@ export default function SkinScan() {
 
       setLoading(true);
       try {
-        const prompt = `Analyze this skin condition image. Suggest top 3 possible conditions with probability percentage. For each condition provide: name, probability (number 0-100), description, recommended_action, and urgency_level (one of: self_treat, see_doctor_soon, see_doctor_immediately). Return as JSON array.`;
+        const prompt = withLanguage(
+          `Analyze this skin condition image. Suggest top 3 possible conditions with probability percentage. For each condition provide: name, probability (number 0-100), description, recommended_action, and urgency_level (one of: self_treat, see_doctor_soon, see_doctor_immediately). Return as JSON array.`,
+          language
+        );
         const raw = await callGeminiWithImage(base64, file.type, prompt);
         let parsed = parseJSON<SkinCondition[]>(raw);
         if (!parsed) {
@@ -82,7 +89,11 @@ export default function SkinScan() {
       }
     };
     reader.readAsDataURL(file);
-  }, []);
+  }, [language]);
+
+  const shareText = results
+    ? `Skin Scan Results\n\n${results.map((r, i) => `${i + 1}. ${r.name} (${r.probability}%) — ${r.urgency_level.replace(/_/g, " ")}`).join("\n")}`
+    : "";
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">
@@ -141,7 +152,7 @@ export default function SkinScan() {
       )}
 
       {results && (
-        <div className="mt-8 space-y-4">
+        <div id="skinscan-result" className="mt-8 space-y-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             Top {results.length} Possible Conditions
           </h2>
@@ -192,6 +203,11 @@ export default function SkinScan() {
               </div>
             );
           })}
+
+          <div className="flex gap-3 flex-wrap pt-2">
+            <PrintButton contentId="skinscan-result" title="Skin Scan Report" />
+            <ShareButtons title="Skin Scan Results" text={shareText} />
+          </div>
         </div>
       )}
 

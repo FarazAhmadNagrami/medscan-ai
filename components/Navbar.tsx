@@ -3,14 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "./ThemeProvider";
+import LanguageSelector from "./LanguageSelector";
+import UserMenu from "./UserMenu";
 
 const navLinks = [
   { href: "/", label: "Dashboard" },
   { href: "/pill-identifier", label: "PillID" },
-  { href: "/lab-report", label: "Lab Report" },
-  { href: "/skin-scan", label: "SkinScan" },
+  { href: "/lab-report", label: "Lab" },
+  { href: "/skin-scan", label: "Skin" },
   { href: "/symptom-mapper", label: "Symptoms" },
   { href: "/diet-advisor", label: "Diet" },
+  { href: "/drug-interaction", label: "Drug Check" },
+  { href: "/prescription-scanner", label: "Rx" },
+  { href: "/vitals", label: "Vitals" },
+  { href: "/history", label: "History" },
 ];
 
 export default function Navbar() {
@@ -28,12 +34,12 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1 overflow-x-auto">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
                   pathname === link.href
                     ? "bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300"
                     : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -44,13 +50,17 @@ export default function Navbar() {
             ))}
           </div>
 
-          <button
-            onClick={toggle}
-            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-            aria-label="Toggle dark mode"
-          >
-            {theme === "dark" ? "☀️" : "🌙"}
-          </button>
+          <div className="flex items-center gap-2">
+            <LanguageSelector />
+            <button
+              onClick={toggle}
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
+            <UserMenu />
+          </div>
         </div>
 
         {/* Mobile nav */}

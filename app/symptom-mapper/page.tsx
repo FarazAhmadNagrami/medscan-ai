@@ -2,8 +2,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import Disclaimer from "@/components/Disclaimer";
+import VoiceInput from "@/components/VoiceInput";
+import BodyMap from "@/components/BodyMap";
+import DoctorFinder from "@/components/DoctorFinder";
+import ShareButtons from "@/components/ShareButtons";
+import PrintButton from "@/components/PrintButton";
 import { callGeminiText, parseJSON, RATE_LIMIT_ERROR } from "@/lib/gemini";
 import RateLimitError from "@/components/RateLimitError";
+import { useLanguage, withLanguage } from "@/lib/language";
 
 interface Condition {
   name: string;
@@ -30,7 +36,11 @@ export default function SymptomMapper() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [bodyParts, setBodyParts] = useState<string[]>([]);
+  const [showBodyMap, setShowBodyMap] = useState(false);
+  const [lastParsed, setLastParsed] = useState<AiResponse | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { language } = useLanguage();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -41,7 +51,11 @@ export default function SymptomMapper() {
     if (!text || loading) return;
     setInput("");
 
-    const userMsg: Message = { role: "user", content: text };
+    const locationNote = bodyParts.length > 0
+      ? ` (Affected areas: ${bodyParts.join(", ")})`
+      : "";
+
+    const userMsg: Message = { role: "user", content: text + locationNote };
     const history = [...messages, userMsg];
     setMessages(history);
     setLoading(true);
@@ -51,7 +65,10 @@ export default function SymptomMapper() {
         .map((m) => `${m.role === "user" ? "Patient" : "AI"}: ${m.content}`)
         .join("\n");
 
-      const prompt = `${SYSTEM_PROMPT}\n\nConversation:\n${conversation}\n\nRespond with structured JSON.`;
+      const prompt = withLanguage(
+        `${SYSTEM_PROMPT}\n\nConversation:\n${conversation}\n\nRespond with structured JSON.`,
+        language
+      );
       const raw = await callGeminiText(prompt);
       const parsed = parseJSON<AiResponse>(raw);
 
@@ -61,6 +78,7 @@ export default function SymptomMapper() {
         parsed: parsed ?? undefined,
       };
       setMessages([...history, assistantMsg]);
+      if (parsed) setLastParsed(parsed);
 
       // Save to history
       if (parsed) {
@@ -81,7 +99,7 @@ export default function SymptomMapper() {
         {
           role: "assistant",
           content: isRateLimit
-            ? "⏱️ Rate limit reached — Gemini free tier allows ~15 requests/minute. Please wait ~30 seconds and send your message again."
+            ? "⏱️ Rate limit reached — please wait ~30 seconds and send your message again."
             : "Sorry, I encountered an error. Please try again.",
         },
       ]);
@@ -99,21 +117,37 @@ export default function SymptomMapper() {
     }
   };
 
+  const shareText = lastParsed
+    ? `Symptom Analysis\n\nTop condition: ${lastParsed.conditions[0]?.name ?? "—"}\nUrgency: ${lastParsed.urgency_level}\nRecommended specialist: ${lastParsed.recommended_specialist}`
+    : "";
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 flex flex-col" style={{ height: "calc(100vh - 120px)" }}>
-      <div className="mb-6">
+      <div className="mb-4">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
           <span className="text-4xl">💬</span> Symptom Mapper
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mt-2">
           Describe your symptoms in natural language for AI-powered analysis.
         </p>
+        <button
+          onClick={() => setShowBodyMap(!showBodyMap)}
+          className="mt-3 text-xs px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-lg hover:border-blue-400 transition-colors"
+        >
+          🫀 {showBodyMap ? "Hide" : "Show"} Body Map
+        </button>
       </div>
 
+      {showBodyMap && (
+        <div className="mb-4">
+          <BodyMap onSelect={setBodyParts} />
+        </div>
+      )}
+
       {/* Chat area */}
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
+      <div id="symptom-result" className="flex-1 overflow-y-auto space-y-4 mb-4 pr-1">
         {messages.length === 0 && (
-          <div className="text-center py-16 text-gray-400 dark:text-gray-600">
+          <div className="text-center py-12 text-gray-400 dark:text-gray-600">
             <div className="text-5xl mb-4">💬</div>
             <p className="text-lg font-medium">Start by describing your symptoms</p>
             <p className="text-sm mt-1">
@@ -247,8 +281,13 @@ export default function SymptomMapper() {
         <div ref={bottomRef} />
       </div>
 
+      {/* Rate limit error in chat */}
+      {messages[messages.length - 1]?.content === RATE_LIMIT_ERROR && (
+        <RateLimitError onRetry={() => { setInput(messages[messages.length - 2]?.content ?? ""); }} />
+      )}
+
       {/* Input area */}
-      <div className="flex gap-3">
+      <div className="flex gap-2 mt-2">
         <input
           type="text"
           value={input}
@@ -258,6 +297,7 @@ export default function SymptomMapper() {
           className="flex-1 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
           disabled={loading}
         />
+        <VoiceInput onTranscript={(t) => setInput((prev) => prev ? prev + " " + t : t)} disabled={loading} />
         <button
           onClick={send}
           disabled={loading || !input.trim()}
@@ -266,6 +306,17 @@ export default function SymptomMapper() {
           Send
         </button>
       </div>
+
+      {/* Share/print + doctor finder */}
+      {lastParsed && (
+        <div className="mt-4 space-y-3">
+          <div className="flex gap-3 flex-wrap">
+            <PrintButton contentId="symptom-result" title="Symptom Analysis Report" />
+            <ShareButtons title="Symptom Analysis" text={shareText} />
+          </div>
+          <DoctorFinder specialty={lastParsed.recommended_specialist} />
+        </div>
+      )}
 
       <Disclaimer />
     </div>

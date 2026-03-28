@@ -31,7 +31,7 @@ const modules = [
   {
     title: "Symptom Mapper",
     description:
-      "Describe your symptoms in natural language. Get mapped conditions, specialist recommendations, and follow-up questions.",
+      "Describe your symptoms in natural language. Get mapped conditions, specialist recommendations, body map, and voice input.",
     icon: "💬",
     href: "/symptom-mapper",
     gradient: "bg-gradient-to-br from-green-500 to-emerald-400",
@@ -46,6 +46,42 @@ const modules = [
     gradient: "bg-gradient-to-br from-teal-500 to-lime-400",
     badge: "Nutrition AI",
   },
+  {
+    title: "Drug Interaction Checker",
+    description:
+      "Enter 2+ medications to instantly check for interactions, contraindications, and severity-rated warnings.",
+    icon: "⚗️",
+    href: "/drug-interaction",
+    gradient: "bg-gradient-to-br from-red-500 to-rose-400",
+    badge: "Safety AI",
+  },
+  {
+    title: "Prescription Scanner",
+    description:
+      "Photograph or upload a prescription. Get plain-English breakdown of every medication, dosage, and follow-up.",
+    icon: "📜",
+    href: "/prescription-scanner",
+    gradient: "bg-gradient-to-br from-indigo-500 to-blue-400",
+    badge: "Vision AI",
+  },
+  {
+    title: "Vitals Tracker",
+    description:
+      "Log daily health metrics — BP, blood sugar, weight, heart rate. Track trends with interactive charts and normal-range alerts.",
+    icon: "📈",
+    href: "/vitals",
+    gradient: "bg-gradient-to-br from-pink-500 to-fuchsia-400",
+    badge: "Tracker",
+  },
+  {
+    title: "Scan History",
+    description:
+      "Browse your complete scan timeline across all modules. All data stored locally on your device — fully private.",
+    icon: "📋",
+    href: "/history",
+    gradient: "bg-gradient-to-br from-gray-500 to-slate-400",
+    badge: "Local",
+  },
 ];
 
 export default function Dashboard() {
@@ -55,7 +91,7 @@ export default function Dashboard() {
       <div className="text-center mb-14">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium mb-4">
           <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse inline-block" />
-          Powered by Gemini 1.5 Flash
+          Powered by Gemini Vision AI
         </div>
         <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-4">
           Your AI Medical{" "}
@@ -64,8 +100,8 @@ export default function Dashboard() {
           </span>
         </h1>
         <p className="max-w-2xl mx-auto text-lg text-gray-500 dark:text-gray-400">
-          Five intelligent modules to help you understand medications, lab
-          results, skin conditions, symptoms, and diet — all in one place.
+          Nine intelligent modules to help you understand medications, lab
+          results, skin conditions, symptoms, diet, vitals, and more — all in one place.
         </p>
       </div>
 
@@ -79,10 +115,10 @@ export default function Dashboard() {
       {/* Stats strip */}
       <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
         {[
-          { label: "AI Model", value: "Gemini 1.5" },
-          { label: "Modules", value: "5" },
+          { label: "AI Model", value: "Gemini Flash" },
+          { label: "Modules", value: "9" },
           { label: "Drug Database", value: "RxNorm" },
-          { label: "Response Time", value: "~3s" },
+          { label: "Data Storage", value: "Local" },
         ].map((stat) => (
           <div
             key={stat.label}
