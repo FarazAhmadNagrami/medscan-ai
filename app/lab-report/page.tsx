@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, lazy, Suspense } from "react";
 import FileUpload from "@/components/FileUpload";
 import Disclaimer from "@/components/Disclaimer";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
 import { callGeminiText, callGeminiWithImages, parseJSON, RATE_LIMIT_ERROR } from "@/lib/gemini";
 import RateLimitError from "@/components/RateLimitError";
 import PrintButton from "@/components/PrintButton";
+
+const CameraCapture = lazy(() => import("@/components/CameraCapture"));
 
 interface LabParameter {
   parameter: string;
@@ -84,6 +86,7 @@ export default function LabReport() {
   // Image state
   const [images, setImages] = useState<ImageEntry[]>([]);
   const [dragging, setDragging] = useState(false);
+  const [cameraOpen, setCameraOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Shared
@@ -276,6 +279,16 @@ export default function LabReport() {
             </div>
           )}
 
+          {/* Camera button */}
+          {images.length < MAX_IMAGES && (
+            <button
+              onClick={() => setCameraOpen(true)}
+              className="mt-3 w-full py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 rounded-xl text-sm font-medium hover:border-purple-400 hover:text-purple-600 transition-colors flex items-center justify-center gap-2"
+            >
+              📷 Take Photo with Camera
+            </button>
+          )}
+
           {images.length > 0 && !loading && (
             <button
               onClick={analyzeImages}
@@ -283,6 +296,15 @@ export default function LabReport() {
             >
               Analyze {images.length} {images.length === 1 ? "Image" : "Images"} Together
             </button>
+          )}
+
+          {cameraOpen && (
+            <Suspense fallback={null}>
+              <CameraCapture
+                onCapture={(file) => { addFiles([file]); setCameraOpen(false); }}
+                onClose={() => setCameraOpen(false)}
+              />
+            </Suspense>
           )}
         </>
       )}
