@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/lib/language";
 import { AuthProvider } from "@/lib/auth";
 import AuthGuard from "@/components/AuthGuard";
+import FirestoreSyncProvider from "@/components/FirestoreSyncProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased">
         <ThemeProvider>
           <AuthProvider>
+          <FirestoreSyncProvider>
           <LanguageProvider>
           <Navbar />
           <main className="flex-1"><AuthGuard>{children}</AuthGuard></main>
@@ -45,6 +47,7 @@ export default function RootLayout({
             only. Not a substitute for professional medical advice.
           </footer>
           </LanguageProvider>
+          </FirestoreSyncProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
