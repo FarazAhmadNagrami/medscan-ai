@@ -38,7 +38,7 @@ export default function RateLimitError({ onRetry, waitSeconds = 30 }: RateLimitE
             Rate limit reached
           </p>
           <p className="text-orange-700 dark:text-orange-400 text-xs mt-0.5">
-            Gemini free tier allows ~15 requests/minute. No auto-retries are fired — your quota is safe.
+            No auto-retries are fired — your quota is safe.
           </p>
         </div>
       </div>
