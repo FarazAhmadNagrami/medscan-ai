@@ -56,9 +56,13 @@ export default function RootLayout({
           <main className="flex-1"><AuthGuard>{children}</AuthGuard></main>
           <footer className="text-center text-xs text-gray-400 dark:text-gray-600 py-4 border-t border-gray-200 dark:border-gray-800 space-y-1">
             <p>© {new Date().getFullYear()} MedScan AI — For informational use only. Not a substitute for professional medical advice.</p>
-            <p>
+            <p className="flex items-center justify-center gap-3">
               <Link href="/terms" className="underline hover:text-gray-500 dark:hover:text-gray-400 transition-colors">
                 Terms of Service
+              </Link>
+              <span>·</span>
+              <Link href="/privacy" className="underline hover:text-gray-500 dark:hover:text-gray-400 transition-colors">
+                Privacy Policy
               </Link>
             </p>
           </footer>
