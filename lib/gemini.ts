@@ -1,6 +1,6 @@
 export const RATE_LIMIT_ERROR = "RATE_LIMIT_429";
 
-async function callGemini(body: { type: "text" | "image"; prompt: string; base64?: string; mimeType?: string }): Promise<string> {
+async function callGemini(body: { type: "text" | "image" | "images"; prompt: string; base64?: string; mimeType?: string; images?: { base64: string; mimeType: string }[] }): Promise<string> {
   const res = await fetch("/api/gemini", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -22,6 +22,13 @@ export async function callGeminiWithImage(
   prompt: string
 ): Promise<string> {
   return callGemini({ type: "image", prompt, base64: base64Image, mimeType });
+}
+
+export async function callGeminiWithImages(
+  images: { base64: string; mimeType: string }[],
+  prompt: string
+): Promise<string> {
+  return callGemini({ type: "images", prompt, images });
 }
 
 export function parseJSON<T>(raw: string): T | null {

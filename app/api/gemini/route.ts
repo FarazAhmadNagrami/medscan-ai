@@ -22,16 +22,25 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json() as {
-    type: "text" | "image";
+    type: "text" | "image" | "images";
     prompt: string;
     base64?: string;
     mimeType?: string;
+    images?: { base64: string; mimeType: string }[];
   };
 
-  const parts =
-    body.type === "image" && body.base64 && body.mimeType
-      ? [{ text: body.prompt }, { inline_data: { mime_type: body.mimeType, data: body.base64 } }]
-      : [{ text: body.prompt }];
+  let parts: unknown[];
+  if (body.type === "images" && body.images?.length) {
+    // Multiple images in one call (e.g. multi-page lab report)
+    parts = [
+      { text: body.prompt },
+      ...body.images.map((img) => ({ inline_data: { mime_type: img.mimeType, data: img.base64 } })),
+    ];
+  } else if (body.type === "image" && body.base64 && body.mimeType) {
+    parts = [{ text: body.prompt }, { inline_data: { mime_type: body.mimeType, data: body.base64 } }];
+  } else {
+    parts = [{ text: body.prompt }];
+  }
 
   const geminiRes = await fetch(GEMINI_URL, {
     method: "POST",
